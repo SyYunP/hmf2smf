@@ -1,0 +1,95 @@
+[build-system]
+requires = [
+  "setuptools>=62.1",
+  "setuptools_scm[toml]>=8.0.0",
+  "wheel",]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hmf2smf"
+description = "Calculate stellar mass function from halo mass function."
+requires-python = ">=3.9"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+license = { file = "licenses/LICENSE.rst" }
+authors = [
+  { name = "Sy-Yun Pu", email = "syyun.pu@mail.utoronto.ca" },
+]
+dependencies = [
+  "numpy",
+  "scipy"
+]
+dynamic = ["version"]
+
+[project.scripts]
+open_astronomy_package_template_example = "hmf2smf.example_mod:main"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-doctestplus",
+    "pytest-cov",
+]
+docs = [
+    "sphinx",
+    "sphinx-automodapi",
+    "numpydoc"
+]
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["hmf2smf*"]
+
+[tool.setuptools_scm]
+version_file = "hmf2smf/version.py"
+
+[tool.pytest.ini_options]
+testpaths = [
+  "hmf2smf",
+  "docs",
+]
+doctest_plus = "enabled"
+text_file_format = "rst"
+addopts = "--doctest-rst"
+norecursedirs = ["hmf2smf[\\/]_dev"]
+
+[tool.coverage.run]
+omit = [
+ "hmf2smf/__init*",
+ "hmf2smf/conftest.py",
+ "hmf2smf/*setup_package*",
+ "hmf2smf/tests/*",
+ "hmf2smf/*/tests/*",
+ "hmf2smf/extern/*",
+ "hmf2smf/version*",
+ "*/hmf2smf/__init*",
+ "*/hmf2smf/conftest.py",
+ "*/hmf2smf/*setup_package*",
+ "*/hmf2smf/tests/*",
+ "*/hmf2smf/*/tests/*",
+ "*/hmf2smf/extern/*",
+ "*/hmf2smf/version*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  # Have to re-enable the standard pragma
+  "pragma: no cover",
+  # Don't complain about packages we have installed
+  "except ImportError",
+  # Don't complain if tests don't hit assertions
+  "raise AssertionError",
+  "raise NotImplementedError",
+  # Don't complain about script hooks
+  "def main(.*):",
+  # Ignore branches that don't pertain to this version of Python
+  "pragma: py{ignore_python_version}",
+  # Don't complain about IPython completion helper
+  "def _ipython_key_completions_",
+  # typing.TYPE_CHECKING is False at runtime
+  "if TYPE_CHECKING:",
+  # Ignore typing overloads
+  "@overload",
+]

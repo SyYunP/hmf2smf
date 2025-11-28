@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.integrate import quad
 
+__all__ = ["stellarmass_func", "snrate", "SFE_SNFeedback"]
+
 def stellarmass_func(hmf,Omega_b = 0.0412,Omega_m=0.2725):
     '''
     Sets up a steller mass function from a halo mass function including supernova feedback.

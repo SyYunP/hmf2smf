@@ -20,6 +20,10 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.urls]
+repository = "https://github.com/SyYunP/hmf2smf"
+documentation = "https://hmf2smf.readthedocs.io"
+
 [project.scripts]
 open_astronomy_package_template_example = "hmf2smf.example_mod:main"
 

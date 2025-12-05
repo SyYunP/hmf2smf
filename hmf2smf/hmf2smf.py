@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.integrate import quad
-import  colossus.cosmology.cosmology as c
 
 __all__ = ["stellarmass_func", "snrate", "SFE_SNFeedback"]
 
@@ -23,13 +22,13 @@ def stellarmass_func(hmf,sfe,cosmo = None):
     smf : `array-like object`, as the input halo mass function
         Stellar mass function
     '''
-    if isinstance(sfe, (list, tuple, np.ndarray)) and (sfe.shape != hmf.shape):
+    if isinstance(sfe, (list, tuple, np.ndarray)) and isinstance(hmf, (list, tuple, np.ndarray)) and (np.array(sfe).shape != np.array(hmf).shape):
         raise ValueError("The shape of star formation efficiency must be the same as the halo mass function.")
     
     if cosmo is None:
         raise ValueError("Input cosmology cannot be None.")
     
-    smf = hmf*(cosmo.Ob0/cosmo.Om0)*sfe
+    smf = np.array(hmf)*(cosmo.Ob0/cosmo.Om0)*np.array(sfe)
 
     return smf
 
@@ -90,7 +89,7 @@ def _setup_IMF_fromname(imf):
                 return m**-1.3
         return Kroupa
     else:
-        return "This initial mass function does not exist in the package."
+        return ValueError("This initial mass function does not exist in the package.")
 
 def _mass_integral(m,func):
     '''
@@ -105,7 +104,7 @@ def _mass_integral(m,func):
     '''
     return m*func(m)
 
-def SFE_SNFeedback(z,hmf,SNrate,f_gas = 1.0,SNEnergy = 50300737,cosmo=None):
+def SFE_SNFeedback(z,hmf,cosmo,SNrate,f_gas = 1.0,SNEnergy = 50300737):
     '''
     Solve star formation efficiency when gas binding energy equals to supernovae feedback energy.
 
@@ -115,14 +114,14 @@ def SFE_SNFeedback(z,hmf,SNrate,f_gas = 1.0,SNEnergy = 50300737,cosmo=None):
         Redshift
     hmf : `float` or array-like object
         Halo mass function
+    cosmo : `colossus.cosmology.cosmology`
+        Cosmology object from colossus. 
     SNrate : `float`
         Supernova rate (number/solar mass)
     f_gas : `float`, optional
         Fraction of energy contribution to ambient gas (default value: 1.0)
     SNEnergy : `float`, optional
-        Released energy from every single supernova (default value: 50300737)
-    cosmo : `colossus.cosmology.cosmology`, optional
-        Cosmology object from colossus. 
+        Released energy from every single supernova (solar mass*km^2/s^2 default value: 50300737)
 
     Returns
     ----------

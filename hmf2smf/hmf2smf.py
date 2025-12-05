@@ -1,30 +1,36 @@
 import numpy as np
 from scipy.integrate import quad
+import  colossus.cosmology.cosmology as c
 
 __all__ = ["stellarmass_func", "snrate", "SFE_SNFeedback"]
 
-def stellarmass_func(hmf,Omega_b = 0.0412,Omega_m=0.2725):
+def stellarmass_func(hmf,sfe,cosmo = None):
     '''
     Sets up a steller mass function from a halo mass function including supernova feedback.
     
     Parameters
     ----------
-    hmf : array-like object
+    hmf : `float` or array-like object
         Halo mass function
-    Omega_b : `float`, optional
-        Cosmic baryon mass density (default value: 0.0412)
-    Omega_m : `float`, optional
-        Cosmic mass density (default value: 0.2725)
-    sfe : `float`, optional
-        Star formation efficiency (default value: 1.0)
-
+    sfe : `float` or array-like object
+        Star formation efficiency
+        Note that the shape of the sfe must be the same as the hmf
+    cosmo : `colossus.cosmology.cosmology`
+        Cosmology object from colossus. 
+    
     Returns
     -------
     smf : `array-like object`, as the input halo mass function
         Stellar mass function
     '''
-    sfe = SFE_SNFeedback()
-    smf = hmf*(Omega_b/Omega_m)*sfe
+    if isinstance(sfe, (list, tuple, np.ndarray)) and (sfe.shape != hmf.shape):
+        raise ValueError("The shape of star formation efficiency must be the same as the halo mass function.")
+    
+    if cosmo is None:
+        raise ValueError("Input cosmology cannot be None.")
+    
+    smf = hmf*(cosmo.Ob0/cosmo.Om0)*sfe
+
     return smf
 
 def snrate(imf,SNthreshold=8,mlowerbound=0.1,mupperbound=100):
@@ -33,9 +39,9 @@ def snrate(imf,SNthreshold=8,mlowerbound=0.1,mupperbound=100):
 
     Parameters
     ----------
-    imf : `str` or `function`
-        Initial mass function. Users can directly request for `salpeter` (Salpeter 1955) or 
-        `kroupa` (Kroupa 2002) initial mass function with `str` or input custom function for 
+    imf : `str` or `func`
+        Initial mass function. Users can directly request for "salpeter" (Salpeter 1955) or 
+        "kroupa" (Kroupa 2002) initial mass function with `str` or input custom function for 
         integration.
     SNthreshold : `float`, optional
         The lower mass bound of supernova progenitors (default value: 8)
@@ -52,7 +58,9 @@ def snrate(imf,SNthreshold=8,mlowerbound=0.1,mupperbound=100):
     if isinstance(imf,str):
         imf = _setup_IMF_fromname(imf)
         pass
+
     snrate = quad(imf,SNthreshold,mupperbound)[0]/quad(_mass_integral,mlowerbound,mupperbound,args=imf)[0]
+    
     return snrate
 
 def _setup_IMF_fromname(imf):
@@ -92,30 +100,45 @@ def _mass_integral(m,func):
     ----------
     m : array-like object
         mass
-    func : `function`
+    func : `func`
         initial mass function that takes m as input.
     '''
     return m*func(m)
 
-def SFE_SNFeedback(vc,f_gas,SNrate,SNEnergy):
+def SFE_SNFeedback(z,hmf,SNrate,f_gas = 1.0,SNEnergy = 50300737,cosmo=None):
     '''
     Solve star formation efficiency when gas binding energy equals to supernovae feedback energy.
 
     Parameters
     ----------
-    vc : `float`
-        Circular velocity of halo
-    f_gas : `float`
-        Fraction of energy contribution to ambient gas
+    z : `float`
+        Redshift
+    hmf : `float` or array-like object
+        Halo mass function
     SNrate : `float`
         Supernova rate (number/solar mass)
-    SNEnergy : `float`
-        Released energy from every single supernova
+    f_gas : `float`, optional
+        Fraction of energy contribution to ambient gas (default value: 1.0)
+    SNEnergy : `float`, optional
+        Released energy from every single supernova (default value: 50300737)
+    cosmo : `colossus.cosmology.cosmology`, optional
+        Cosmology object from colossus. 
 
     Returns
     ----------
     sfe : `float`
         Star formation efficiency when binding energy equals to supernova energy
     '''
-    sfe = vc*vc/(vc*vc+f_gas*SNrate*SNEnergy)
+    if cosmo is None:
+        raise ValueError("Input cosmology cannot be None.")
+
+    vc = _vvir(hmf,z,cosmo)
+    vcsq = vc*vc
+    sfe = vcsq/(vcsq+f_gas*SNrate*SNEnergy)
     return sfe
+
+def _vir_overdens(z,cosmo):
+    return 18*np.pi*np.pi+82*(cosmo.Om(z)-1)-39*(cosmo.Om(z)-1)*(cosmo.Om(z)-1)
+
+def _vvir(hmf,z,cosmo):
+    return 23.4*(hmf/1e8)**(1/3)*(cosmo.Om(z)*_vir_overdens(z,cosmo)/cosmo.Om(z)/18/np.pi/np.pi)**(1/6)*((1+z)/10)**0.5

@@ -16,7 +16,8 @@ authors = [
 ]
 dependencies = [
   "numpy",
-  "scipy"
+  "scipy",
+  "colossus"
 ]
 dynamic = ["version"]
 

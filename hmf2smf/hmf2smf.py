@@ -3,7 +3,7 @@ from scipy.integrate import quad
 
 __all__ = ["stellarmass_func", "snrate", "SFE_SNFeedback"]
 
-def stellarmass_func(hmf,sfe,cosmo = None):
+def stellarmass_func(hmf,sfe,cosmo):
     '''
     Sets up a steller mass function from a halo mass function including supernova feedback.
     
@@ -24,9 +24,6 @@ def stellarmass_func(hmf,sfe,cosmo = None):
     '''
     if isinstance(sfe, (list, tuple, np.ndarray)) and isinstance(hmf, (list, tuple, np.ndarray)) and (np.array(sfe).shape != np.array(hmf).shape):
         raise ValueError("The shape of star formation efficiency must be the same as the halo mass function.")
-    
-    if cosmo is None:
-        raise ValueError("Input cosmology cannot be None.")
     
     smf = np.array(hmf)*(cosmo.Ob0/cosmo.Om0)*np.array(sfe)
 
@@ -128,9 +125,6 @@ def SFE_SNFeedback(z,hmf,cosmo,SNrate,f_gas = 1.0,SNEnergy = 50300737):
     sfe : `float`
         Star formation efficiency when binding energy equals to supernova energy
     '''
-    if cosmo is None:
-        raise ValueError("Input cosmology cannot be None.")
-
     vc = _vvir(hmf,z,cosmo)
     vcsq = vc*vc
     sfe = vcsq/(vcsq+f_gas*SNrate*SNEnergy)

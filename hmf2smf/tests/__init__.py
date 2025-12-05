@@ -27,8 +27,6 @@ def test_stellarmass_func():
     with pytest.raises(ValueError):
         stellarmass_func(test_HMF,test_sfe_2,test_cosmo)
     test_sfe_3 = [10,20,30]
-    with pytest.raises(ValueError):
-        stellarmass_func(test_HMF,test_sfe_3)
     assert stellarmass_func(test_HMF,test_sfe_3,test_cosmo) == pytest.approx(np.array([1.57505625e+07, 3.15011250e+11, 4.72516876e+15]),rel=1e-8)
     assert stellarmass_func(test_HMF5,test_cosmo) == pytest.approx(np.array([7.87528126e+06, 7.87528126e+10, 7.87528126e+14]),rel=1e-8)
     assert stellarmass_func(1e7,test_sfe_3,test_cosmo) == pytest.approx(np.array([15750562.52009001, 31501125.04018001, 47251687.56027002]),rel=1e-8)

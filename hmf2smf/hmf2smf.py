@@ -19,7 +19,7 @@ def stellarmass_func(hmf,sfe,cosmo):
     
     Returns
     -------
-    smf : `array-like object`, as the input halo mass function
+    smf : `array-like object`, shape as the input halo mass function
         Stellar mass function
     '''
     if isinstance(sfe, (list, tuple, np.ndarray)) and isinstance(hmf, (list, tuple, np.ndarray)) and (np.array(sfe).shape != np.array(hmf).shape):

@@ -1,6 +1,6 @@
 hmf2smf calculates stellar mass function from halo mass function. It relies on 
-`NumPy <https://numpy.org/>`_ and `SciPy <https://scipy.org/>`_. Please refer to the
-``example_notebook`` file for a simple usage guideline.
+`NumPy <https://numpy.org/>`_, `SciPy <https://scipy.org/>`_ and `Colossus <https://bdiemer.bitbucket.io/colossus/index.html>`_. 
+Please refer to `the documentation <https://hmf2smf.readthedocs.io/en/latest/>` for a simple usage guideline.
 
 --------------------------------------------------------
 

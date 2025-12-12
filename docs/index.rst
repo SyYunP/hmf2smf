@@ -62,13 +62,13 @@ set the cosmology as one of the example cosmology
 
 Next, we calculates the supernova rate of any given initial mass function. One can define 
 their own initial mass function or use common initial mass functions contained in the package.
-
+   >>> from hmf2smf import snrate, SFE_SNFeedback, stellarmass_func
    >>> snr = snrate('salpeter')
 
 or 
 
    >>> def my_salpeter(m):
-   >>>     return m**-2.35
+   ...     return m**-2.35
    >>> snr = snrate(my_salpeter)
 
 For now, we provide solutions of `Salpeter (1955) <https://ui.adsabs.harvard.edu/abs/1955ApJ...121..161S/abstract>`_ 
@@ -83,7 +83,8 @@ redshift, halo mass, cosmology and the supernova rate.
 
 Finally, we can calculate the stellar mass.
 
-   >>> stellarmass_func(halo_mass,sfe,cosmo)
+   >>> stellarmass_func(halo_mass,sfe,cosmo) # doctest: +FLOAT_CMP
+   np.float64(29254178.153382637)
 
 .. toctree::
    :maxdepth: 2
